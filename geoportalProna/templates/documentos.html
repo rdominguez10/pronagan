@@ -1,0 +1,143 @@
+{% extends 'template.html' %} {% block contenido %} {% load static %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <select
+        class="form-select"
+        id="rancho"
+        aria-label="Default select example"
+      >
+        <option selected>Seleccionar rancho</option>
+        {% for rancho in ranchos %}
+        <option value="{{ rancho.id }}">{{ rancho.id }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <select
+        class="form-select"
+        id="tipo_mapa"
+        aria-label="Default select example"
+      >
+        <option selected>Seleccionar tipo de mapa</option>
+        {% for mapa in tipo_mapa %}
+        <option value="{{ mapa.tipo }}">{{ mapa.tipo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="row" id="contenedor">
+    <!-- Card 1 -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <div class="card" style="width: 18rem">
+        <img
+          src="{% static 'mapas/Mapa_base.jpg' %}"
+          class="card-img-top"
+          alt="..."
+        />
+        <div class="card-body">
+          <h5 class="card-title">Mapa General</h5>
+          <!--<p class="card-text">
+            Some quick example text to build on the card title and make up the
+            bulk of the card's content.
+          </p>-->
+          <a href="{% static 'mapas/Mapa_base.jpg' %}" class="btn btn-primary"
+            >Descargar</a
+          >
+        </div>
+      </div>
+    </div>
+    <!-- Card 2 -->
+  </div>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+  crossorigin="anonymous"
+></script>
+<script>
+  $("#rancho").on("change", function (e) {
+    var valueSelected = this.value;
+    $.ajax({
+      url: '{% url "consulta_mapas_ranchos" %}',
+      method: "POST",
+      data: JSON.stringify({ datos: valueSelected, tipo: "rancho" }),
+      dataType: "json",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      success: function (response) {
+        const contenedor = $("#contenedor");
+        contenedor.empty();
+        response.imagenes.forEach((mapas) => {
+          console.log(`mapa: ${mapas.imagen}`);
+
+          const card = $(`
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <div class="card h-100">
+        <img
+          src="/static/${mapas.imagen}"
+          class="card-img-top"
+          alt="Imagen 8"
+        />
+        <div class="card-body">
+          <h5 class="card-title">Rancho: ${valueSelected} </h5>
+          <p class="card-text">Este mapa describe ${mapas.tipo}.</p>
+          <a href="/static/${mapas.imagen}" class="btn btn-primary">Descargar</a>
+        </div>
+      </div>
+    </div>
+        `);
+
+          contenedor.append(card);
+        });
+      },
+      error: function () {
+        alert("Error al conectar con el servidor", "danger");
+      },
+    });
+  });
+
+  $("#tipo_mapa").on("change", function (e) {
+    var valueSelected = this.value;
+    $.ajax({
+      url: '{% url "consulta_mapas_ranchos" %}',
+      method: "POST",
+      data: JSON.stringify({ datos: valueSelected, tipo: "tipo" }),
+      dataType: "json",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      success: function (response) {
+        const contenedor = $("#contenedor");
+        contenedor.empty();
+        response.imagenes.forEach((mapas) => {
+          console.log(`mapa: ${mapas.imagen}`);
+
+          const card = $(`
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <div class="card h-100">
+        <img
+          src="/static/${mapas.imagen}"
+          class="card-img-top"
+          alt="Imagen 8"
+        />
+        <div class="card-body">
+          <h5 class="card-title">Mapa de ${valueSelected} </h5>
+          <p class="card-text">Este mapa describe ${mapas.tipo}.</p>
+          <a href="/static/${mapas.imagen}" class="btn btn-primary">Descargar</a>
+        </div>
+      </div>
+    </div>
+        `);
+
+          contenedor.append(card);
+        });
+      },
+      error: function () {
+        alert("Error al conectar con el servidor", "danger");
+      },
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menú Interactivo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      .menu-section {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.4s ease;
+        position: relative;
+      }
+
+      .menu-section:hover {
+        transform: scale(1.5);
+        z-index: 2;
+      }
+
+      .overlay {
+        background-color: rgba(0, 0, 0, 0.3);
+        height: 100%;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.3s ease;
+      }
+
+      .overlay:hover {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .logo {
+        max-width: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">HUMANA</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Inicio</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#">Proyectos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Menú Visual -->
+    <div class="d-flex justify-content-center align-items-center vh-100">
+      <div class="container">
+        <div class="row justify-content-center g-3">
+          <div class="col-6 col-md-4 col-lg-2">
+            <div
+              class="menu-section"
+              style="
+                background-image: url('{% static 'logos/ganaderia.jpeg'%}');
+              "
+            >
+              <div class="overlay text-center">
+                <a
+                  href="{% url 'mapaGanaderia' %}"
+                  class="text-decoration-none text-white"
+                >
+                  <i class="fas fa-cow fa-3x mb-2"></i>
+                  <h5>Hola</h5>
+                  <p>This is a example</p>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div
+              class="menu-section"
+              style="background-image: url('{% static 'logos/mapa.jpeg'%}')"
+            >
+              <div class="overlay text-center">
+                <img
+                  src="{% static 'logos/mapa.jpeg' %}"
+                  class="logo"
+                  alt="Titulo"
+                />
+                <h5>Hola</h5>
+                <p>This is a example2</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    x
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

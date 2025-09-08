@@ -1,0 +1,56 @@
+{% extends 'contenido_administrador.html' %} {% block contenido_admin %}
+<main class="col-lg-9 p-4">
+  <div class="container-fluid mt-4">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h5>Lista de Productores</h5>
+        <button class="btn btn-success btn-sm" id="addNewRow">
+          <i class="fas fa-plus"></i> Nuevo
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" id="editableTable">
+            <thead class="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {%for usuario in usuarios %}
+              <tr data-id="{{ usuario.id }}">
+                <td>{{ usuario.id }}</td>
+                <td class="editable" data-field="username">
+                  {{ usuario.username }}
+                </td>
+                <td class="editable" data-field="nombre">
+                  {{ usuario.nombre }}
+                </td>
+                <td class="editable" data-field="apellidos">
+                  {{ usuario.apellidos }}
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-primary edit-row">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger delete-row">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'contenido_administrador.html' %} {% block contenido_admin %}
+<main class="col-lg-9 p-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">Formulario de Registro</h3>
+    </div>
+    <div class="card-body">
+      <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_username" class="form-label">Usuario</label>
+            {{form.usuario}} {% if form.usuario.errors %}
+            <div class="invalid-feedback">
+              {{ form.usuario.errors|join:", " }}
+            </div>
+            <script>
+              document
+                .getElementById("{{ form.usuario.id_for_label }}")
+                .classList.add("is-invalid");
+            </script>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_username" class="form-label">Nombre</label>
+            {{form.nombre}}{% if form.usuario.errors %}
+            <div class="invalid-feedback">
+              {{ form.nombre.errors|join:", " }}
+            </div>
+            <script>
+              document
+                .getElementById("{{ form.nombre.id_for_label }}")
+                .classList.add("is-invalid");
+            </script>
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+            <label for="id_email" class="form-label">Apellidos</label>
+            {{form.apellidos}}{% if form.apellidos.errors %}
+            <div class="invalid-feedback">
+              {{ form.apellidos.errors|join:", " }}
+            </div>
+            <script>
+              document
+                .getElementById("{{ form.apellidos.id_for_label }}")
+                .classList.add("is-invalid");
+            </script>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_password1" class="form-label">Contraseña</label>
+            {{form.contrasena}}
+            {% if form.contrasena.errors %}
+            <div class="invalid-feedback">
+              {{ form.contrasena.errors|join:", " }}
+            </div>
+            <script>
+              document
+                .getElementById("{{ form.contrasena.id_for_label }}")
+                .classList.add("is-invalid");
+            </script>
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+            <label for="id_password2" class="form-label"
+              >Confirmar Contraseña</label
+            >
+            {{form.rep_contrasena}}{% if form.rep_contrasena.errors %}
+            <div class="invalid-feedback">
+              {{ form.rep_contrasena.errors|join:", " }}
+            </div>
+            <script>
+              document
+                .getElementById("{{ form.rep_contrasena.id_for_label }}")
+                .classList.add("is-invalid");
+            </script>
+            {% endif %}
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button type="submit" class="btn btn-primary me-md-2">
+            <i class="bi bi-save me-1"></i> Guardar
+          </button>
+          <button type="reset" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i> Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+<script>
+  document.querySelectorAll('.is-invalid').forEach(element => {
+            element.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                const feedback = this.parentElement.querySelector('.invalid-feedback');
+                if(feedback) feedback.style.display = 'none';
+            });
+        });
+
+        const password1 = document.getElementById('{{ form.contrasena.id_for_label }}');
+        const password2 = document.getElementById('{{ form.rep_contrasena.id_for_label }}');
+        
+        if(password1 && password2) {
+            password2.addEventListener('input', function() {
+                if(password1.value !== password2.value) {
+                    password2.classList.add('is-invalid');
+                    let feedback = password2.parentElement.querySelector('.invalid-feedback');
+                    if(!feedback) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback';
+                        feedback.textContent = 'Las contraseñas no coinciden';
+                        password2.parentElement.appendChild(feedback);
+                    } else {
+                        feedback.style.display = 'block';
+                    }
+                } else {
+                    password2.classList.remove('is-invalid');
+                    const feedback = password2.parentElement.querySelector('.invalid-feedback');
+                    if(feedback) feedback.style.display = 'none';
+                }
+            });
+        }
+</script>
+{% endblock %}

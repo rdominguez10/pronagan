@@ -1,0 +1,1128 @@
+{% extends 'template.html' %} {% block contenido %}{% load static %}
+
+<div
+  class="offcanvas offcanvas-start"
+  data-bs-scroll="true"
+  data-bs-backdrop="false"
+  tabindex="-1"
+  id="offcanvasScrolling"
+  aria-labelledby="offcanvasScrollingLabel"
+  style="width: 500px !important"
+>
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
+      Información que proviene de la consulta
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav">
+      <li class="nav-item">
+        <a
+          class="nav-link active menu_rancho"
+          aria-current="page"
+          id="ambiental"
+          href="#"
+          >Ambiental</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link menu_rancho" id="ganado" href="#">Ganado</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link menu_rancho" id="parcela" href="#">Parcela</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link menu_rancho" id="financiero" href="#"
+          >Análisis Financiero</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          href="https://mexico.inaturalist.org/projects/union-de-productores-agropecuarios-regenerativos-de-echegaray-chis?tab=species"
+          target="_blank"
+          >Biodiversidad</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link menu_rancho" id="descarga" href="#"
+          >Descargar graficos</a
+        >
+      </li>
+    </ul>
+    <div id="contenedor-graficos" class="row gy-4"></div>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<div class="legend-panel shadow-sm">
+  <h5 class="mb-3">Capas del Mapa</h5>
+  <div id="leyenda-contenido" class="form-check d-flex flex-column gap-2"></div>
+</div>
+
+<div id="popup" class="ol-popup">
+  <a href="#" id="popup-closer" class="ol-popup-closer">×</a>
+  <div id="popup-content"></div>
+</div>
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <i class="fas fa-cow fa-3x mb-2"></i>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Bienvenidos a la aplicación de ganaderia
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Esta aplicación se elaboró en el marco del proyecto.., con el objetivo
+        de analizar las tendencias de deforestación y su relación con los
+        programas federales en materia agrícola, pecuaria y forestal.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modalGanado" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-title"></h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="menu-container" id="menu">
+          <a href="#" class="menu-item">
+            <i class="fas fa-sign-in-alt"></i>
+            <div class="menu-text">Ingreso</div>
+          </a>
+          <a href="#" class="menu-item">
+            <i class="fas fa-utensils"></i>
+            <div class="menu-text">Alimento</div>
+          </a>
+          <a href="#" class="menu-item" id="consulta_salud">
+            <i class="fas fa-heartbeat"></i>
+            <div class="menu-text">Salud</div>
+          </a>
+          <a href="#" class="menu-item" id="consulta_partos">
+            <i class="fas fa-cow"></i>
+            <div class="menu-text">Partos</div>
+          </a>
+          <a href="#" class="menu-item">
+            <i class="fas fa-hand-holding-usd"></i>
+            <div class="menu-text">Ventas</div>
+          </a>
+          <a href="#" class="menu-item">
+            <i class="fas fa-flask"></i>
+            <div class="menu-text">Producción</div>
+          </a>
+        </div>
+        <div class="row" id="modalGanadoBody"></div>
+        <div id="contenedor-reporte" style="display: none"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="exportar_informe">
+          Exportar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+  crossorigin="anonymous"
+></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/geotiff@2.0.7/dist-browser/geotiff.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+  window.onload = function () {
+    var myModal = new bootstrap.Modal(document.getElementById("exampleModal"));
+    myModal.show();
+    let charts = {};
+    var rancho_consulta = null;
+    var seleccion_ganado = null;
+    var ambiental = null;
+    const colores = {
+      Arenosol: "#FBFFA5",
+      Cambisol: "#9A8B8A",
+      Fluvisol: "#96E9DD",
+      Gleysol: "#E1E8BC",
+      Leptosol: "#EBD51B",
+      Technosol: "#4E3F3F",
+      Luvisol: "#FFAB30",
+      Phaeozem: "#CDAE85",
+      Regosol: "#FDC683",
+      "Suelo cubierto por agua": "#3498db",
+      Solonchak: "#B65353",
+      "BOSQUE MESÓFILO DE MONTAÑA": "#08C1A5",
+      "VEGETACIÓN SECUNDARIA ARBÓREA DE BOSQUE MESÓFILO DE MONTAÑA": "#1BE8D0",
+      "VEGETACIÓN SECUNDARIA ARBÓREA DE SELVA ALTA PERENNIFOLIA": "#F658BF",
+      "VEGETACIÓN SECUNDARIA ARBUSTIVA DE SELVA ALTA PERENNIFOLIA": "#E68BCA",
+      "BOSQUE INDUCIDO": "#1DD073",
+      MANGLAR: "#88D9B9	",
+      "VEGETACIÓN SECUNDARIA ARBÓREA DE MANGLAR": "#C1EEAD",
+      "VEGETACIÓN SECUNDARIA ARBUSTIVADE MANGLAR": "#D1F2E5",
+      TULAR: "#DDEACC",
+      "PASTIZAL CULTIVADO": "#EFEB9C",
+      "PASTIZAL INDUCIDO": "#EFDA7E",
+      "AGRICULTURA DE TEMPORAL PERMANENTE": "#FFE771",
+      "AGRICULTURA DE TEMPORAL ANUAL": "#FFAE2B",
+      "SIN VEGETACIÓN APARENTE": "#978989	",
+      "ÁREA DESPROVISTA DE VEGETACIÓN": "#DDE3D8",
+      "URBANO CONSTRUIDO": "#000000",
+      AGUA: "#2875FA",
+      "Cálido húmedo": "#CCCD34",
+      "Cálido subhúmedo": "#FFDF4F",
+      "Semicálido húmedo": "#26E2D1",
+      "Templado húmedo": "#5EB1C2",
+      Baja: "#36E653",
+      Media: "#FFDC13",
+      Alta: "#FE7E27",
+      "Muy alta": "#FC002A",
+      bajo: "#F7FF5D",
+      alto: "#FFC527",
+      Aluvial: "#94E195",
+      Conglomerado: "#BD8F2A",
+      Granito: "#E37D39",
+      Granodiorita: "#C3534E",
+      Lacustre: "#B9EBCE",
+      Litoral: "#F3E682",
+      "Cuerpo de agua": "#3498db",
+      "No aplica": "#000000",
+      "Llanura costera": "#DFEA41",
+      "Llanura costera inundable y salina": "#DAFFBF",
+      "Sierra alta de laderas escarpadas": "#DA7E1C",
+      "De 33 a 34.5°C": "#D7191C",
+      "De 30 a 33°C": "#FDAE61",
+      "De 27 a 30°C": "#FFFFC0",
+      "De 24 a 27°C": "#A6D96A",
+      "De 21 a 24°C": "#1A9641",
+      "> 33°C": "#D7191C",
+      "De 30 a 33 °C": "#F59053",
+      "De 27 a 30 °C": "#FEDF9A",
+      "De 24 a 27 °C": "#DBF09E",
+      "De 21 a 24 °C": "#8ACC62",
+      "De 18 a 21 °C": "#1A9641",
+      "De 9 a 12°C": "#1A9641",
+      "De 12 a 15°C": "#A6D96A",
+      "De 15 a 18°C": "#FFFFC0",
+      "De 18 a 21°C": "#FDAE61",
+      "De 21 a 22.5°C": "#D7191C",
+      "De 9 a 12 °C": "#1A9641",
+      "De 12 a 15 °C": "#C4E687",
+      "De 15 a 18 °C": "#FEC981",
+      "De 18 a 19.5 °C": "#D7191C",
+      "De 1400 a 1700 mm": "#F7FBFF",
+      "De 1700 a 2000 mm": "#AFD1E7",
+      "De 2000 a 2300 mm": "#3E8EC4",
+      "De 2300 a 2600 mm": "#08306B",
+    };
+    const layers = {};
+    let activeLayer = null;
+    const extent4326 = [
+      -93.445232235, 15.321834142, -92.753130442, 15.811199046,
+    ];
+    const extent3857 = ol.proj.transformExtent(
+      extent4326,
+      "EPSG:4326",
+      "EPSG:3857"
+    );
+    const baseLayers = {
+      "osm-standard": new ol.layer.Tile({
+        title: "OpenStreetMap Estándar",
+        type: "base",
+        visible: true,
+        source: new ol.source.OSM(),
+      }),
+      "osm-carto-light": new ol.layer.Tile({
+        title: "CartoDB Claro",
+        type: "base",
+        visible: false,
+        source: new ol.source.OSM({
+          url: "https://{a-c}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+        }),
+      }),
+      "osm-carto-dark": new ol.layer.Tile({
+        title: "CartoDB Oscuro",
+        type: "base",
+        visible: false,
+        source: new ol.source.OSM({
+          url: "https://{a-c}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        }),
+      }),
+    };
+    $(document).on("click", "#osm-standard", function () {
+      setBaseLayer("osm-standard");
+    });
+    $(document).on("click", "#osm-carto-light", function () {
+      setBaseLayer("osm-carto-light");
+    });
+    $(document).on("click", "#osm-carto-dark", function () {
+      setBaseLayer("osm-carto-dark");
+    });
+    function setBaseLayer(layerId) {
+      Object.keys(baseLayers).forEach((key) => {
+        baseLayers[key].setVisible(false);
+      });
+
+      baseLayers[layerId].setVisible(true);
+    }
+    var map = new ol.Map({
+      target: "map",
+      layers: Object.values(baseLayers),
+      view: new ol.View({
+        projection: "EPSG:4326",
+        center: [-93.11, 15.56],
+        zoom: 11,
+      }),
+    });
+
+    const capasConfig = [
+      {
+        id: "climas",
+        nombre: "Leyenda - Tipo de climas:",
+        direccion: "consulta_climas",
+      },
+      {
+        id: "erosion",
+        nombre: "Leyenda - Erosion:",
+        direccion: "consulta_erosion",
+      },
+      {
+        id: "geologia",
+        nombre: "Leyenda - Geologia:",
+        direccion: "consulta_geologia",
+      },
+      {
+        id: "deslizamiento",
+        nombre: "Leyenda - Riesgo de deslizamiento:",
+        direccion: "consulta_deslizamiento",
+      },
+      {
+        id: "rios",
+        nombre: "Leyenda - Rios:",
+        direccion: "consulta_rios",
+      },
+      {
+        id: "suelos",
+        nombre: "Leyenda - Tipos de suelo:",
+        direccion: "consulta_suelos",
+      },
+      {
+        id: "topoformas",
+        nombre: "Leyenda - Tipos de Topoformas:",
+        direccion: "consulta_topoformas",
+      },
+      {
+        id: "usv_2014",
+        nombre: "Leyenda - Vegetación y uso del suelo 2014 INEGI:",
+        direccion: "consulta_usv_2014",
+      },
+      {
+        id: "temp_max_may_oct",
+        nombre: "Leyenda - Temperatura Maxima Mayo-Octubre:",
+        direccion: "consulta_temperatura_max_may_oct",
+      },
+      {
+        id: "temp_max_nov_abr",
+        nombre: "Leyenda - Temperatura Maxima Noviembre-Abril:",
+        direccion: "consulta_temperatura_max_nov_abr",
+      },
+      {
+        id: "temp_min_may_oct",
+        nombre: "Leyenda - Temperatura Mínima Mayo-Octubre:",
+        direccion: "consulta_temperatura_min_may_oct",
+      },
+      {
+        id: "temp_min_nov_abr",
+        nombre: "Leyenda - Temperatura Mínima Noviembre-Abril:",
+        direccion: "consulta_temperatura_min_nov_abr",
+      },
+      {
+        id: "precp_may_oct",
+        nombre: "Leyenda - Precipitación Mayo Octubre:",
+        direccion: "consulta_precp_may_oct",
+      },
+      {
+        id: "aptitud_forestal",
+        nombre: "Leyenda - Aptitud forestal:",
+        direccion: "/media/aptitud_forestal2.png",
+      },
+    ];
+    const capas = {};
+    let primero = 0;
+
+    $(document).on("click", ".capas", function () {
+      id = $(this).attr("id");
+      const datoBuscar = capasConfig.find((c) => c.id === id);
+      direccion = datoBuscar.direccion;
+      titulo = datoBuscar.nombre;
+      if (id == "aptitud_forestal") {
+        const vectorSource = new ol.source.ImageStatic({
+          url: direccion,
+          imageExtent: extent3857,
+          projection: "EPSG:3857",
+        });
+        capas[id] = new ol.layer.Image({
+          source: vectorSource,
+        });
+        map.getView().fit(extent4326, {
+          padding: [50, 50, 50, 50],
+          maxZoom: 16,
+        });
+        layers[id] = {
+          layer: capas[id],
+        };
+        if (primero == 0) {
+          activeLayer = id;
+          map.addLayer(capas[id]);
+          primero = 1;
+        } else {
+          nombre = id;
+          mostrarCapa(nombre);
+        }
+        //map.addLayer(capas[id]);
+      } else {
+        $.ajax({
+          url: direccion,
+          method: "POST",
+          data: JSON.stringify({ tabla: id }),
+          dataType: "json",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+          success: function (response) {
+            const vectorSource = new ol.source.Vector({
+              features: new ol.format.GeoJSON().readFeatures(response, {
+                featureProjection: "EPSG:4326",
+              }),
+            });
+            if (id != "rios") {
+              capas[id] = new ol.layer.Vector({
+                source: vectorSource,
+                style: function (feature) {
+                  const clase = feature.get("tipo");
+                  const color = colores[clase] || "#cccccc";
+                  return new ol.style.Style({
+                    fill: new ol.style.Fill({ color: color + "99" }),
+                    stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                  });
+                },
+              });
+              data = generarDataParaLeyenda(capas[id]);
+              leyenda(data, titulo);
+            } else {
+              color_rio = "rgba(39, 139, 253, 0.9)";
+              capas[id] = new ol.layer.Vector({
+                source: vectorSource,
+                style: new ol.style.Style({
+                  stroke: new ol.style.Stroke({
+                    color: "rgba(39, 139, 253, 0.9)",
+                    width: 2,
+                  }),
+                  fill: new ol.style.Fill({
+                    color: color_rio,
+                  }),
+                }),
+              });
+              const contenedor = $("#leyenda-contenido");
+              contenedor.empty();
+              let html = `<strong>${titulo}</strong><ul class="list-unstyled">`;
+
+              html += `
+            <li><span class="leyenda-color" style="background-color: ${color_rio}"></span>Rios</li>
+          `;
+              html += "</ul>";
+              contenedor.append(html);
+            }
+            const extent = vectorSource.getExtent();
+            map.getView().fit(extent, {
+              padding: [50, 50, 50, 50],
+              maxZoom: 16,
+            });
+
+            layers[id] = {
+              layer: capas[id],
+            };
+            if (primero == 0) {
+              activeLayer = id;
+              map.addLayer(capas[id]);
+              primero = 1;
+            } else {
+              nombre = id;
+              mostrarCapa(nombre);
+            }
+          },
+          error: function () {
+            alert("Error al conectar con el servidor", "danger");
+          },
+        });
+      }
+    });
+
+    function generarDataParaLeyenda(capa) {
+      const tipos = {};
+      capa
+        .getSource()
+        .getFeatures()
+        .forEach((feature) => {
+          const tipo = feature.get("tipo");
+          if (!tipos[tipo]) {
+            const style = capa.getStyleFunction()(feature);
+            tipos[tipo] = {
+              color: style.getFill().getColor(),
+              features: [feature],
+            };
+          } else {
+            tipos[tipo].features.push(feature);
+          }
+        });
+
+      return Object.keys(tipos).map((tipo) => ({
+        nombre: tipo,
+        color: tipos[tipo].color,
+      }));
+    }
+
+    function leyenda(data, titulo) {
+      const contenedor = $("#leyenda-contenido");
+      contenedor.empty();
+      let html = `<strong>${titulo}</strong><ul class="list-unstyled">`;
+      data.forEach((item) => {
+        html += `
+            <li><span class="leyenda-color" style="background-color: ${item.color}"></span>${item.nombre}</li>
+          `;
+      });
+      html += "</ul>";
+      contenedor.append(html);
+    }
+    function mostrarCapa(nombre) {
+      if (activeLayer) map.removeLayer(layers[activeLayer].layer);
+      map.addLayer(layers[nombre].layer);
+      //$("#leyenda").html(layers[nombre].leyenda);
+      activeLayer = nombre;
+    }
+
+    $(document).on("click", "#ranchos", function () {
+      var data = $(this).attr("id");
+
+      $.ajax({
+        url: '{% url "consulta_ranchos" %}',
+        method: "POST",
+        data: JSON.stringify({ tabla: data }),
+        dataType: "json",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        success: function (response) {
+          rios = response;
+          console.log("typo recibida:", rios);
+          const vectorSource = new ol.source.Vector({
+            features: new ol.format.GeoJSON().readFeatures(rios, {
+              featureProjection: "EPSG:4326",
+            }),
+          });
+          const vectorLayer = new ol.layer.Vector({
+            source: vectorSource,
+            style: new ol.style.Style({
+              stroke: new ol.style.Stroke({
+                color: "blue",
+                width: 2,
+              }),
+              fill: new ol.style.Fill({
+                color: "rgba(0, 0, 255, 0.1)",
+              }),
+            }),
+          });
+          map.addLayer(vectorLayer);
+          vectorLayer.setZIndex(999);
+          const extent = vectorSource.getExtent();
+          map.getView().fit(extent, {
+            padding: [50, 50, 50, 50],
+            maxZoom: 16,
+          });
+        },
+        error: function () {
+          alert("Error al conectar con el servidor", "danger");
+        },
+      });
+    });
+
+    const popup = new ol.Overlay({
+      element: document.getElementById("popup"),
+      positioning: "bottom-center",
+      stopEvent: false,
+    });
+    map.addOverlay(popup);
+
+    $("#popup-closer").click(function () {
+      popup.setPosition(undefined);
+      return false;
+    });
+
+    /*const raster = new ol.layer.WebGLTile({
+          source: new ol.source.GeoTIFF({
+            sources: [
+              {
+                url: "http://localhost/raster/aptitud_forestal_rend_3b.tif",
+                bands: [1, 2, 3],
+                nodata: 0,
+              },
+            ],
+            convertToRGB: true,
+          }),
+          opacity: 1,
+          visible: true,
+        });
+        map.addLayer(raster);*/
+
+    map.on("click", function (evt) {
+      const feature = map.forEachFeatureAtPixel(evt.pixel, function (f) {
+        return f;
+      });
+
+      if (feature) {
+        const properties = feature.getProperties();
+        if (properties.tabla == "ranchos") {
+          const offcanvasEl = document.getElementById("offcanvasScrolling");
+          const offcanvas = new bootstrap.Offcanvas(offcanvasEl);
+          offcanvas.show();
+
+          rancho_consulta = properties.id;
+          consulta_ambiental(rancho_consulta);
+
+          const content = `
+                            <h6>${properties.nombre}</h6>
+                            <hr>
+                            <p><strong>Tipo:</strong> ${properties.tabla}</p>
+                            <p><strong>Tipo:</strong> ${properties.id}</p>
+                            <p><strong>Área:</strong> ${(
+                              properties.area / 10000
+                            ).toFixed(2)} ha</p>
+                            <p><small>ID: ${properties.id}</small></p>
+                        `;
+
+          $("#popup-content").html(content);
+          popup.setPosition(evt.coordinate);
+        } else {
+          popup.setPosition(undefined);
+        }
+      } else {
+        popup.setPosition(undefined);
+      }
+    });
+
+    function consulta_ambiental(rancho_consulta) {
+      $.ajax({
+        url: '{% url "consulta_graficos" %}',
+        method: "POST",
+        data: JSON.stringify({ tabla: rancho_consulta }),
+        dataType: "json",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        success: function (response) {
+          ambiental = response;
+          console.log(ambiental);
+          generar_graficos(ambiental);
+        },
+        error: function () {
+          alert("Error al conectar con el servidor", "danger");
+        },
+      });
+    }
+    function generar_graficos(ambiental) {
+      const contenedor = $("#contenedor-graficos");
+      contenedor.empty();
+      Object.entries(ambiental).forEach(([clave, dataset]) => {
+        const canvasId = `grafico-${clave}`;
+        const card = $(`
+                    <div class="col-md-12">
+
+                          <canvas id="${canvasId}" height="200"></canvas>
+
+                    </div>
+                  `);
+        contenedor.append(card);
+
+        const ctx = document.getElementById(canvasId).getContext("2d");
+
+        const { labels, datos, titulo } = dataset;
+
+        const datasets = labels.map((label, i) => ({
+          label: label,
+          data: [datos[i]],
+          backgroundColor: colores[label] || "#95a5a6",
+        }));
+
+        const backgroundColors = dataset.labels.map(
+          (label) => colores[label] || "#95a5a6"
+        );
+
+        if (charts[clave]) charts[clave].destroy();
+
+        charts[clave] = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [""], // truco: solo una categoría vacía para apilar los datasets
+            datasets: datasets,
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "top",
+              },
+              title: {
+                display: true,
+                text: titulo,
+              },
+            },
+            scales: {
+              x: {
+                stacked: false,
+              },
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      });
+    }
+    function exportarOffcanvasPDF() {
+      const element = document.getElementById("contenedor-graficos");
+
+      const opt = {
+        margin: 10,
+        filename: "reporte_offcanvas.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] },
+      };
+
+      html2pdf().from(element).set(opt).save();
+    }
+    function obtenerGanado(rancho_consulta) {
+      $.ajax({
+        url: "ganado",
+        method: "POST",
+        data: JSON.stringify({ tabla: rancho_consulta }),
+        success: function (response) {
+          const ganado = response.ganado;
+          console.log(ganado);
+          const contenedor = $("#contenedor-graficos");
+          contenedor.empty();
+          var card = `
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Raza</th>
+                <th>Sexo</th>
+                <th>Procedencia</th>
+                <th>Peso</th>
+                <th>Estado General</th>
+              </tr>
+            </thead>
+            <tbody>
+              `;
+
+          ganado.forEach((item) => {
+            const dataAttr = encodeURIComponent(JSON.stringify(item));
+
+            card += `
+        <tr class="fila-ganado" data-ganado="${dataAttr}">
+          <td>${item.idganado}</td>
+          <td>${item.nombre}</td>
+          <td>${item.raza}</td>
+          <td>${item.sexo}</td>
+          <td>${item.procedencia}</td>
+          <td>${item.peso}</td>
+          <td>${item.estado}</td>
+        </tr>
+      `;
+          });
+          card += `
+          </tbody>
+        </table>
+      </div>
+    `;
+          const domCreado = $(card);
+          contenedor.append(domCreado);
+
+          $(".fila-ganado").on("click", function () {
+            const datosStr = $(this).data("ganado");
+            const datos = JSON.parse(decodeURIComponent(datosStr));
+
+            seleccion_ganado = datos.idganado;
+            reporte_general(datos);
+            $("#modal-title").text(`Detalle del ganado  ${datos.nombre}`);
+            $("#modalGanado").modal("show");
+          });
+        },
+        error: function () {
+          alert("Error al cargar los datos del ganado");
+        },
+      });
+    }
+
+    function reporte_general(datos) {
+      $.ajax({
+        url: "reporte_general",
+        method: "POST",
+        data: JSON.stringify({ ganado: seleccion_ganado }),
+        success: function (response) {
+          const vacunas = response.vacunas;
+          const desparacitacion = response.desparacitantes;
+          const partos = response.partos;
+          const contenedor = $("#modalGanadoBody");
+          contenedor.empty();
+          var card = `
+                        <div class="text-center mb-4">
+                <img src="media/ganado/${datos.idganado}.jpg" alt="${datos.nombre}" class="foto-ganado">
+              </div>
+
+              <div class="mb-4">
+                <h4 class="section-title text-success">Información General</h4>
+                <div class="row">
+                  <div class="col-md-6 mb-2"><span class="info-label">Nombre:</span> ${datos.nombre}</div>
+                  <div class="col-md-6 mb-2"><span class="info-label">Raza:</span> ${datos.raza}</div>
+                  <div class="col-md-6 mb-2"><span class="info-label">Sexo:</span> ${datos.sexo}</div>
+                  <div class="col-md-6 mb-2"><span class="info-label">Procedencia:</span> ${datos.procedencia}</div>
+                  <div class="col-md-6 mb-2"><span class="info-label">Peso:</span> ${datos.peso} kg</div>
+                  <div class="col-md-6 mb-2"><span class="info-label">Estado:</span> ${datos.estado}</div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <h4 class="section-title text-success">Alimentación</h4>
+                <p>La Ñata se alimenta de pasto fresco, silo de maíz y suplementos minerales. Su dieta está supervisada por un veterinario para asegurar el buen desarrollo durante la gestación.</p>
+              </div>
+              <h4 class="section-title text-success">Información de Salud</h4>
+                <div class="col-lg-12 col-md-12 mb-6">
+        <h5 class="text-center mb-3">💉 Vacunación</h5>
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha vacuna</th>
+                <th>Proxima vacuna</th>
+                <th>Producto</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              `;
+
+          vacunas.forEach((item) => {
+            const dataAttr = encodeURIComponent(JSON.stringify(item));
+
+            card += `
+        <tr class="fila-ganado" data-ganado="${dataAttr}">
+          <td>${item.fecha_vacuna}</td>
+          <td>${item.proxima_vacuna}</td>
+          <td>${item.tipo_vacuna}</td>
+          <td>${item.descripcion}</td>
+        </tr>
+      `;
+          });
+          card += `
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+
+          <div class="col-lg-12 col-md-12 mb-6">
+        <h5 class="text-center mb-3">🧪 Desparasitación</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha desparacitacion</th>
+                <th>Próxima desparacitacion</th>
+                <th>Producto</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+  `;
+
+          desparacitacion.forEach((item) => {
+            const dataAttr = encodeURIComponent(JSON.stringify(item));
+
+            card += `
+        <tr class="fila-ganado" data-ganado="${dataAttr}">
+          <td>${item.fecha_desparacitacion}</td>
+          <td>${item.proxima_desparacitacion}</td>
+          <td>${item.tipo_desparacitande}</td>
+          <td>${item.descripcion}</td>
+        </tr>
+      `;
+          });
+          card += `
+          </tbody>
+        </table>
+      </div>
+      </div>
+      <h4 class="section-title text-success">Información de Partos</h4>
+      <div class="col-lg-6 col-md-12 mb-4">
+        <h5 class="text-center mb-3">Partos</h5>
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha parto</th>
+                <th>Nombre de la cria</th>
+              </tr>
+            </thead>
+            <tbody>
+              `;
+
+          partos.forEach((item) => {
+            const dataAttr = encodeURIComponent(JSON.stringify(item));
+
+            card += `
+        <tr class="fila-ganado" data-ganado="${dataAttr}">
+          <td>${item.fecha_parto}</td>
+          <td>${item.nombre_becerro}</td>
+        </tr>
+      `;
+          });
+          card += `
+          </tbody>
+        </table>
+      </div>
+      </div>
+          <div class="mb-4">
+                <h4 class="section-title text-success">Producción</h4>
+                <p>
+                  <strong>Leche:</strong> Promedio de 12 litros por día durante la lactancia.<br>
+                  <strong>Carne:</strong> No aplica (uso dedicado a producción de leche y cría).
+                </p>
+              </div>
+    `;
+          const domCreado = $(card);
+          contenedor.append(domCreado);
+          console.log(response);
+        },
+        error: function () {
+          alert("Error al cargar los datos del ganado");
+        },
+      });
+    }
+
+    $("#consulta_salud").click(function () {
+      $.ajax({
+        url: "consulta_ganado",
+        method: "POST",
+        data: JSON.stringify({ ganado: seleccion_ganado }),
+        success: function (response) {
+          const vacunas = response.vacunas;
+          const desparacitacion = response.desparacitantes;
+          const contenedor = $("#modalGanadoBody");
+          contenedor.empty();
+          var card = `
+                <div class="col-lg-6 col-md-12 mb-4">
+        <h5 class="text-center mb-3">💉 Vacunación</h5>
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha vacuna</th>
+                <th>Proxima vacuna</th>
+                <th>Producto</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              `;
+
+          vacunas.forEach((item) => {
+            const dataAttr = encodeURIComponent(JSON.stringify(item));
+
+            card += `
+        <tr class="fila-ganado" data-ganado="${dataAttr}">
+          <td>${item.fecha_vacuna}</td>
+          <td>${item.proxima_vacuna}</td>
+          <td>${item.tipo_vacuna}</td>
+          <td>${item.descripcion}</td>
+        </tr>
+      `;
+          });
+          card += `
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+          <div class="col-lg-6 col-md-12 mb-4">
+        <h5 class="text-center mb-3">🧪 Desparasitación</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha desparacitacion</th>
+                <th>Próxima desparacitacion</th>
+                <th>Producto</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+  `;
+
+          desparacitacion.forEach((item) => {
+            const dataAttr = encodeURIComponent(JSON.stringify(item));
+
+            card += `
+        <tr class="fila-ganado" data-ganado="${dataAttr}">
+          <td>${item.fecha_desparacitacion}</td>
+          <td>${item.proxima_desparacitacion}</td>
+          <td>${item.tipo_desparacitande}</td>
+          <td>${item.descripcion}</td>
+        </tr>
+      `;
+          });
+          card += `
+          </tbody>
+        </table>
+      </div>
+      </div>
+    `;
+          const domCreado = $(card);
+          contenedor.append(domCreado);
+          console.log(response);
+        },
+        error: function () {
+          alert("Error al cargar los datos del ganado");
+        },
+      });
+      //alert(rancho_consulta);
+    });
+
+    $("#consulta_partos").click(function () {
+      $.ajax({
+        url: "consulta_partos",
+        method: "POST",
+        data: JSON.stringify({ ganado: seleccion_ganado }),
+        success: function (response) {
+          const partos = response.partos;
+          console.log(response);
+          const contenedor = $("#modalGanadoBody");
+          contenedor.empty();
+          var card = `
+                <div class="col-lg-6 col-md-12 mb-4">
+        <h5 class="text-center mb-3">Partos</h5>
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha parto</th>
+                <th>Nombre de la cria</th>
+              </tr>
+            </thead>
+            <tbody>
+              `;
+
+          partos.forEach((item) => {
+            const dataAttr = encodeURIComponent(JSON.stringify(item));
+
+            card += `
+        <tr class="fila-ganado" data-ganado="${dataAttr}">
+          <td>${item.fecha_parto}</td>
+          <td>${item.nombre_becerro}</td>
+        </tr>
+      `;
+          });
+          card += `
+          </tbody>
+        </table>
+      </div>
+      </div>
+    `;
+          const domCreado = $(card);
+          contenedor.append(domCreado);
+          console.log(response);
+        },
+        error: function () {
+          alert("Error al cargar los datos del ganado");
+        },
+      });
+    });
+
+    $("#exportar_informe").click(function () {
+      const element = document.getElementById("modalGanadoBody");
+      html2pdf()
+        .set({
+          filename: "informe_la_ñata.pdf",
+          margin: 15,
+          html2canvas: {
+            scale: 3,
+            useCORS: true,
+          },
+          jsPDF: {
+            unit: "px",
+            format: [794, 1123],
+            orientation: "portrait",
+          },
+          pagebreak: {
+            mode: ["avoid-all"],
+          },
+        })
+        .from(element)
+        .save();
+    });
+
+    $(".menu_rancho").click(function () {
+      var tipo_consulta = $(this).attr("id");
+      console.log(tipo_consulta);
+      if (tipo_consulta == "ambiental") {
+        generar_graficos(ambiental);
+      } else if (tipo_consulta == "descarga") {
+        exportarOffcanvasPDF();
+      } else {
+        obtenerGanado(rancho_consulta);
+      }
+
+      //alert(id);
+    });
+  };
+</script>
+{% endblock %}

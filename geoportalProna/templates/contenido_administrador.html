@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sidebar Responsive con Íconos</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome 6 -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar {
+        background-color: #212529;
+        color: #fff;
+        min-height: 100vh;
+      }
+
+      .sidebar a {
+        color: #fff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .sidebar a:hover {
+        /*color: #fff;*/
+        background-color: #343a40;
+        padding-left: 15px;
+        transition: all 0.2s ease;
+      }
+
+      .sidebar i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+
+      .submenu {
+        padding-left: 30px;
+        display: none;
+      }
+      .submenu.show {
+        display: block;
+      }
+      .has-submenu::after {
+        content: "\f078";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-left: auto;
+        transition: transform 0.3s;
+      }
+      .has-submenu.collapsed::after {
+        transform: rotate(-90deg);
+      }
+      .nav-link {
+        padding-left: 15px !important;
+      }
+
+      @media (min-width: 992px) {
+        .sidebar a {
+          color: #000;
+        }
+        .offcanvas-lg {
+          position: static;
+          transform: none;
+          visibility: visible !important;
+          background-color: #212529;
+          border-right: 1px solid #343a40;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            src="{% static 'logos/LOGOpronaturaSUR.webp' %}"
+            alt="Pronatura"
+            width="55"
+            height="35"
+          />
+        </a>
+      </div>
+    </nav>
+    <nav class="navbar navbar-dark bg-dark d-lg-none">
+      <div class="container-fluid">
+        <button
+          class="btn btn-outline-light"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#sidebar"
+          aria-controls="sidebar"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <span class="navbar-brand mb-0 h1">Administración</span>
+      </div>
+    </nav>
+
+    <!--<div class="container-fluid">
+      <div class="row">
+        <div
+          class="offcanvas-lg offcanvas-start sidebar col-lg-3 p-3"
+          tabindex="-1"
+          id="sidebar"
+        >
+          <h5 class="text-white">Navegación</h5>
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-home"></i> Inicio</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-users-rectangle"></i> Productores</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"><i class="fas fa-cow"></i> Ganado</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-map"></i> Parcelas</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-circle-user"></i> Usuarios</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-sign-out-alt"></i> Cerrar sesion</a
+              >
+            </li>
+          </ul>
+        </div>-->
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <nav class="navbar navbar-dark bg-dark d-lg-none">
+          <div class="container-fluid">
+            <button
+              class="btn btn-outline-light"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#sidebar"
+            >
+              <i class="fas fa-bars"></i> Menú
+            </button>
+            <span class="navbar-brand mb-0 h1">Administración</span>
+          </div>
+        </nav>
+
+        <div
+          class="offcanvas-lg offcanvas-start sidebar col-lg-3 p-3"
+          tabindex="-1"
+          id="sidebar"
+        >
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-white mb-0">Navegación</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-lg-none"
+              data-bs-dismiss="offcanvas"
+            ></button>
+          </div>
+
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <i class="fas fa-home"></i> Inicio
+              </a>
+            </li>
+
+            <!-- Menú Productores con submenú -->
+            <li class="nav-item">
+              <a
+                class="nav-link has-submenu"
+                data-bs-toggle="collapse"
+                href="#productoresSubmenu"
+                role="button"
+              >
+                <i class="fas fa-users-rectangle"></i> Productores
+              </a>
+              <div class="submenu collapse" id="productoresSubmenu">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-list"></i> Lista de Productores
+                </a>
+                <a class="nav-link" href="#">
+                  <i class="fas fa-plus"></i> Nuevo Productor
+                </a>
+                <a class="nav-link" href="#">
+                  <i class="fas fa-chart-bar"></i> Reportes
+                </a>
+              </div>
+            </li>
+
+            <!-- Menú Ganado con submenú -->
+            <li class="nav-item">
+              <a
+                class="nav-link has-submenu"
+                data-bs-toggle="collapse"
+                href="#ganadoSubmenu"
+                role="button"
+              >
+                <i class="fas fa-cow"></i> Ganado
+              </a>
+              <div class="submenu collapse" id="ganadoSubmenu">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-list"></i> Inventario
+                </a>
+                <a class="nav-link" href="#">
+                  <i class="fas fa-exchange-alt"></i> Movimientos
+                </a>
+                <a class="nav-link" href="#">
+                  <i class="fas fa-syringe"></i> Vacunación
+                </a>
+              </div>
+            </li>
+
+            <!-- Menú Parcelas con submenú -->
+            <li class="nav-item">
+              <a
+                class="nav-link has-submenu"
+                data-bs-toggle="collapse"
+                href="#parcelasSubmenu"
+                role="button"
+              >
+                <i class="fas fa-map"></i> Parcelas
+              </a>
+              <div class="submenu collapse" id="parcelasSubmenu">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-list"></i> Todas las Parcelas
+                </a>
+                <a class="nav-link" href="#">
+                  <i class="fas fa-map-marked-alt"></i> Mapa Interactivo
+                </a>
+                <a class="nav-link" href="#">
+                  <i class="fas fa-chart-pie"></i> Análisis
+                </a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link has-submenu"
+                data-bs-toggle="collapse"
+                href="#usuariosSubmenu"
+                role="button"
+              >
+                <i class="fas fa-circle-user"></i> Usuarios
+              </a>
+              <div class="submenu collapse" id="usuariosSubmenu">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-users"></i> Todos los Usuarios
+                </a>
+                <a class="nav-link" href="#">
+                  <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </a>
+              </div>
+            </li>
+            <li class="nav-item mt-3">
+              <a class="nav-link text-danger" href="#">
+                <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+              </a>
+            </li>
+          </ul>
+        </div>
+        {% block contenido_admin %} {% endblock %}
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(document).ready(function () {
+        $(document).on("click", ".edit-row", function () {
+          var row = $(this).closest("tr");
+          row.find(".editable").each(function () {
+            var value = $(this).text().trim();
+            var field = $(this).data("field");
+            $(this).html(
+              `<input type="text" class="form-control form-control-sm" value="${value}" data-original="${value}" data-field="${field}">`
+            );
+          });
+          $(this)
+            .html('<i class="fas fa-save"></i>')
+            .removeClass("btn-primary edit-row")
+            .addClass("btn-success save-row");
+        });
+        $(document).on("click", ".save-row", function () {
+          var row = $(this).closest("tr");
+          var id = row.data("id");
+          var data = { id: id };
+          var hasChanges = false;
+
+          row.find(".editable input").each(function () {
+            var original = $(this).data("original");
+            var current = $(this).val();
+            var field = $(this).data("field");
+
+            if (original !== current) {
+              data[field] = current;
+              hasChanges = true;
+            }
+
+            $(this).parent().text(current);
+          });
+
+          if (hasChanges) {
+            $.ajax({
+              url: '{% url "usuarios_update" %}',
+              method: "POST",
+              data: data,
+              headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+              },
+              success: function (response) {
+                if (response.success) {
+                  showAlert("¡Cambios guardados correctamente!", "success");
+                } else {
+                  showAlert("Error al guardar: " + response.error, "danger");
+                }
+              },
+              error: function () {
+                showAlert("Error al conectar con el servidor", "danger");
+              },
+            });
+          }
+
+          $(this)
+            .html('<i class="fas fa-edit"></i>')
+            .removeClass("btn-success save-row")
+            .addClass("btn-primary edit-row");
+        });
+
+        function showAlert(message, type) {
+          var alert = $(`
+        <div class="alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 1100">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`);
+
+          $("body").append(alert);
+          setTimeout(function () {
+            alert.alert("close");
+          }, 3000);
+        }
+      });
+    </script>
+  </body>
+</html>

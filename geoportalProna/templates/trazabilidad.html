@@ -1,0 +1,54 @@
+{% extends 'template.html' %} {% block contenido %}
+
+<div class="menu-wrapper">
+  <div class="mb-4">
+    <label for="busqueda" class="form-label">Buscar en el menú</label>
+    <input
+      type="text"
+      id="busqueda"
+      class="form-control"
+      placeholder="Escribe para filtrar..."
+      onkeyup="filtrarMenu()"
+    />
+  </div>
+
+  <div class="menu-container" id="menu">
+    <a href="#" class="menu-item">
+      <i class="fas fa-sign-in-alt"></i>
+      <div class="menu-text">Ingreso</div>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-utensils"></i>
+      <div class="menu-text">Alimento</div>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-heartbeat"></i>
+      <div class="menu-text">Salud</div>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-baby"></i>
+      <div class="menu-text">Partos</div>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-hand-holding-usd"></i>
+      <div class="menu-text">Ventas</div>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-flask"></i>
+      <div class="menu-text">Producción</div>
+    </a>
+  </div>
+</div>
+
+<script>
+  function filtrarMenu() {
+    const filtro = document.getElementById("busqueda").value.toLowerCase();
+    const items = document.querySelectorAll(".menu-item");
+
+    items.forEach((item) => {
+      const texto = item.innerText.toLowerCase();
+      item.style.display = texto.includes(filtro) ? "block" : "none";
+    });
+  }
+</script>
+{% endblock %}
