@@ -544,7 +544,6 @@ def consulta_usv_2014(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
-#client = OpenAI(api_key = "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")
 
 @require_POST
 @csrf_exempt
